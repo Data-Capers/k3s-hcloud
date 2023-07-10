@@ -1,0 +1,29 @@
+develop:
+  hcloud_location: fsn1
+  ssh_key: 
+  - Demo
+  image_base:
+    x86: false
+    arm: true
+  network: 
+    name: k3s
+    cidrblock: 10.1.0.0/16
+    subnet:
+      zone: eu-central
+      name: k3s-subnet
+      cidrblock: 10.1.1.0/24
+  topology:
+    hcloud_master_server:
+    - name: master-0
+      network: 10.1.1.1
+      type: cax11
+      image: ubuntu-22.04
+    hcloud_worker_server: 
+    - name: worker-0
+      image: ubuntu-22.04
+      network: 10.1.1.11
+      type: cax21
+    - name: worker-1
+      image: ubuntu-22.04
+      network: 10.1.1.12
+      type: cax21

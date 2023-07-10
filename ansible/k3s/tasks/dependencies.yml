@@ -1,0 +1,22 @@
+---
+- name: Set environment variables
+  shell: |
+    export DEBIAN_FRONTEND=noninteractive
+    export TERM=xterm
+
+- name: Update packages list
+  apt:
+    update_cache: yes
+
+- name: Upgrade all packages
+  apt:
+    upgrade: 'yes'
+
+- name: Install dependencies
+  apt:
+    name: 
+      - docker.io
+      - apt-transport-https
+      - gnupg2
+      - curl
+    state: present

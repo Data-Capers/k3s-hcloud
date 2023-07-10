@@ -1,0 +1,12 @@
+# k3s/tasks/main.yml
+---
+- name: Include dependencies tasks
+  include_tasks: dependencies.yml
+
+- name: Include master tasks on masters
+  include_tasks: k3s_master.yml
+  when: "'masters' in group_names"
+
+- name: Include worker tasks on workers
+  include_tasks: k3s_worker.yml
+  when: "'workers' in group_names"

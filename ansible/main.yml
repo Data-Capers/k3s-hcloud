@@ -1,0 +1,35 @@
+# ansible/main.yml
+---
+- hosts: all
+  become: true
+  roles:
+    - k3s
+  tasks:
+    - name: Retrieve kubeconfig from master
+      fetch:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: "{{ lookup('env','HOME') }}/.kube/k3s.yaml"
+        flat: yes
+      delegate_to: "{{ groups['masters'][0] }}"
+
+    - name: Replace localhost with the remote server's IP
+      replace:
+        path: "{{ lookup('env','HOME') }}/.kube/k3s.yaml"
+        regexp: 'localhost'
+        replace: "{{ ansible_host }}"
+      run_once: true
+      delegate_to: localhost
+
+    - name: Replace 127.0.0.1 with the master's IP
+      replace:
+        path: "{{ lookup('env','HOME') }}/.kube/k3s.yaml"
+        regexp: '127.0.0.1'
+        replace: "{{ hostvars[groups['masters'][0]]['ansible_host'] }}"
+      run_once: true
+      delegate_to: localhost
+      
+    - name: Merge k3s config with the default kubeconfig
+      shell: |
+        export KUBECONFIG={{ lookup('env','HOME') }}/.kube/config:{{ lookup('env','HOME') }}/.kube/k3s.yaml 
+        kubectl config view --flatten > {{ lookup('env','HOME') }}/.kube/merged_kubeconfig.yaml
+      delegate_to: localhost      

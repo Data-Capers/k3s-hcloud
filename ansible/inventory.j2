@@ -1,0 +1,15 @@
+[masters]
+{% for master in masters -%}
+{{ master.name }} ansible_host={{ master.ip }} ansible_user=root
+{% endfor -%}
+
+
+[workers]
+{% for worker in workers -%}
+{{ worker.name }} ansible_host={{ worker.ip }} ansible_user=root
+{% endfor -%}
+
+
+[kubernetes_cluster:children]
+masters
+workers

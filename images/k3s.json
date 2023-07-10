@@ -1,0 +1,33 @@
+{
+  "variables": {
+    "hcloud_token": "{{env `HCLOUD_TOKEN`}}",
+    "ssh_username": "root",
+    "hcloud_location": "{{env `HCLOUD_LOCATION` }}",
+    "hcloud_type_server": "{{env `HCLOUD_TYPE_SERVER` }}",
+    "architecture": "{{env `HCLOUD_ARCHITECTURE` }}"
+  },
+  "builders": [
+    {
+      "type": "hcloud",
+      "token": "{{user `hcloud_token`}}",
+      "image": "ubuntu-22.04",
+      "location": "{{user `hcloud_location`}}",
+      "server_type": "{{user `hcloud_type_server`}}",
+      "ssh_username": "{{user `ssh_username`}}",
+      "snapshot_name": "k3s-base-{{user `architecture`}}-snapshot"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "export DEBIAN_FRONTEND=noninteractive",
+        "export TERM=xterm",
+        "apt-get update",
+        "apt-get upgrade -y",
+        "apt-get install -y docker.io apt-transport-https gnupg2 curl",
+        "curl -Lo get_k3s.sh https://get.k3s.io"
+      ]
+    }
+  ]
+}

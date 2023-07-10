@@ -1,0 +1,16 @@
+---
+- name: Install k3s master
+  shell: "curl -sfL https://get.k3s.io | sh -"
+
+- name: Get node token
+  shell: "cat /var/lib/rancher/k3s/server/node-token"
+  register: master_node_token
+  delegate_to: "{{ groups['masters'][0] }}"
+  run_once: true
+
+- name: Save node token for workers to use
+  copy:
+    content: "{{ master_node_token.stdout }}"
+    dest: "/tmp/k3s-node-token"
+  delegate_to: "{{ groups['masters'][0] }}"
+  run_once: true
