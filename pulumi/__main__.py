@@ -34,7 +34,7 @@ def create_servers(config, network):
         master_instances.append(hcloud.Server(master['name'],
                                     server_type=master['type'],
                                     image=master['image'],
-                                    ssh_keys=config['ssh_key'],
+                                    ssh_keys=master['ssh-key'],
                                     networks=[hcloud.ServerNetworkArgs(network_id=network.id)],
                                     labels={ 'group':'master' })
         )
@@ -42,7 +42,7 @@ def create_servers(config, network):
     for worker in config['topology']['hcloud_worker_server']:
         worker_instances.append(hcloud.Server(worker['name'],
                                     server_type=worker['type'],
-                                    ssh_keys=config['ssh_key'],
+                                    ssh_keys=worker['ssh-key'],
                                     networks=[hcloud.ServerNetworkArgs(network_id=network.id)],
                                     image=worker['image'],
                                     labels={ 'group':'worker' })

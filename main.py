@@ -61,7 +61,7 @@ def ipv4_by_label(label, value):
     # Now ipv4_addresses contains the IPv4 addresses of all servers with the desired label
     return server_info
 
-def setup_k3s() -> None:
+def setup_k3s(config) -> None:
     masters = ipv4_by_label('group', 'master')
     workers = ipv4_by_label('group', 'worker')
 
@@ -70,6 +70,17 @@ def setup_k3s() -> None:
 
     with open('ansible/inventory', 'w') as fo:
         fo.write(template.render({'masters': masters, 'workers': workers}))
+
+    if config['access-ssh-key']['type'] == 'ssh-key':
+        cmd = [
+                'ansible-playbook', 
+                '-i', 'ansible/inventory', 
+                'ansible/main.yml', 
+                '--private-key', config['access-ssh-key']['path']
+            ]
+    os.environ['ANSIBLE_HOST_KEY_CHECKING'] = 'False'
+    subprocess.run(cmd)
+    
 
 def parameters() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -125,4 +136,6 @@ if __name__ == '__main__':
 
     elif not args.create_images:
         create_infrastructure(config, state=args.state)
-    setup_k3s()
+    
+    if config['state'] == 'up':
+        setup_k3s(config)
